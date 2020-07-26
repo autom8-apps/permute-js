@@ -1,11 +1,9 @@
-// @ts-check
-import { IObjectOperation, ISettings, SchemaType, SchemaError } from "./interfaces";
-import { LoDashStatic } from "lodash";
+import { IObjectOperation, ISettings, Schema, SchemaError, LodashUtils } from "./interfaces";
 
 export class Validator implements IObjectOperation {
-  private readonly _: LoDashStatic;
+  private readonly _: LodashUtils;
 
-  constructor(_: LoDashStatic) {
+  constructor(_: LodashUtils) {
     this._ = _;
   }
 
@@ -71,7 +69,7 @@ export class Validator implements IObjectOperation {
    * @param object
    * @param schema
    */
-  validate(object: object, schema: SchemaType|FunctionConstructor): SchemaError|{} {
+  validate(object: object, schema: Schema|FunctionConstructor): SchemaError|{} {
     const errors: SchemaError = {};
     for (const key in schema) {
       if (this.isChild(schema[key], object[key])) {

@@ -1,9 +1,14 @@
-import { IObjectOperation, ISettings, IModelDictionary } from "./interfaces";
+import { IObjectOperation, ISettings, IModelDictionary, LodashUtils } from "./interfaces";
 
 export class ReShaper implements IObjectOperation {
   private settings: ISettings;
   private output: IModelDictionary;
   private object: object;
+  private readonly _: LodashUtils;
+
+  constructor(_: LodashUtils) {
+    this._ = _;
+  }
 
   operate(object: object, settings: ISettings): IModelDictionary {
     try {
@@ -16,11 +21,13 @@ export class ReShaper implements IObjectOperation {
   }
 
   notChildResource(formattedKey: string, unformattedItem: object): boolean {
-    return this.settings.schema[formattedKey] && !Array.isArray(unformattedItem[formattedKey]);
+    return !this.settings.schema.children
+      && !this.settings.schema.children.includes(formattedKey)
+      && !Array.isArray(unformattedItem[formattedKey]);
   }
 
-  notRelatableCollection(unformattedItem: object): boolean {
-    return !unformattedItem[0][this.settings.uid];
+  notRelatableCollection(formattedKey: string, unformattedItem: object): boolean {
+    return !this.settings.schema.children.includes(formattedKey) && !unformattedItem[0][this.settings.uid];
   }
 
   get uid(): string {
@@ -33,7 +40,7 @@ export class ReShaper implements IObjectOperation {
 
   formatChildren(formattedKey: string, unformattedItem: object): object {
     if (this.notChildResource(formattedKey, unformattedItem)) return unformattedItem;
-    if (this.notRelatableCollection(unformattedItem)) return unformattedItem;
+    if (this.notRelatableCollection(formattedKey, unformattedItem)) return unformattedItem;
 
     let hasMany = [];
     for (const child of unformattedItem[formattedKey]) {
@@ -47,7 +54,6 @@ export class ReShaper implements IObjectOperation {
   }
 
   build(): IModelDictionary {
-    this.mapKeys();
     for (let key in this.object) {
       const formattedKey = this.formatKey(key);
       const formattedWithChildren = this.formatChildren(formattedKey, this.object[key]);
@@ -71,20 +77,20 @@ export class ReShaper implements IObjectOperation {
   }
 
   get canMap(): boolean {
-    return this.settings.map && Array.isArray(!this.settings.map) && this.settings.map.length > 0;
+    return this.settings.map && Object.keys(this.settings.map).length > 0;
   }
 
   mapKeys(): void {
     if (!this.canMap) return;
 
-    const { map } = this.settings;
+    const oldKeys = [];
     const formatted = {};
-    for (const { from, to } of map) {
-      if (this.settings.schema[to]) {
-        formatted[to] = this.object[from];
-      }
+
+    for (const mapPoint of this.settings.map[this.settings.current]) {
+      formatted[mapPoint.to] = this.object[mapPoint.from];
+      oldKeys.push(mapPoint.from);
     }
 
-    this.object = formatted;
+    this.object = { ...this._.omit(this.object, oldKeys), ...formatted };
   }
 }

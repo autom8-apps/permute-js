@@ -2,22 +2,28 @@ export interface IObjectOperation {
   operate: (object: object, settings ?: ISettings) => Object|IModelDictionary,
 }
 
+export type IOperation = (object: object, settings?: ISettings) => Object | IModelDictionary;
+
+export interface LodashUtils {
+  isPlainObject: Function
+  isObject: Function
+  omit: Function
+  hasIn: Function
+}
+
 export interface IStrategy {
   setStrategy: (strategy: IObjectOperation) => void
+  getStrategy: (classKey: string) => IObjectOperation
   operate: (object: object, settings?: ISettings) => Object | IModelDictionary,
 }
 
-export interface SchemaType {
+export interface Schema {
   [key: string]: Function|object|null
+  children?: string[]
 }
 
 export interface SchemaError {
   [key: string]: string;
-}
-
-export interface SchemaTypeSettings {
-  schema: SchemaType
-  settings?: ISettings
 }
 
 export interface Validator {
@@ -35,13 +41,18 @@ export interface ISettingsMapPoint {
   to: string
 }
 
+export interface ISettingsMapPoints {
+  [key: string]: ISettingsMapPoint[]
+}
+
 export interface IObjectOperationDictionary {
   [key: string]: IObjectOperation
 }
 
 export interface ISettings {
-  schema: SchemaType
-  map?: ISettingsMapPoint[]
+  current ?: string
+  schema: Schema
+  map?: ISettingsMapPoints
   validate?: boolean
   uid?: string
   childrenUid?: string

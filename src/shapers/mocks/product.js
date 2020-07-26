@@ -1,4 +1,4 @@
-export const product = {
+export const productApiResponse = {
   id: "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0LzI0NDIxNDMzNjcyNDc=",
   availableForSale: true,
   createdAt: "2019-03-07T01:52:36Z",

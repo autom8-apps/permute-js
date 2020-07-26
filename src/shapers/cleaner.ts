@@ -1,15 +1,14 @@
 import * as _ from "lodash";
-import { LoDashStatic } from "lodash";
-import { ISettings, IObjectOperation } from "./interfaces";
+import { ISettings, IObjectOperation, LodashUtils, Schema } from "./interfaces";
 
 export class Cleaner implements IObjectOperation {
-  private readonly _: LoDashStatic;
+  private readonly _: LodashUtils;
 
-  constructor(_: LoDashStatic) {
+  constructor(_: LodashUtils) {
     this._ = _;
   }
 
-  operate(object: object, { schema }: ISettings): {} {
+  operate(object: object, { schema }: ISettings): object {
     return this._.omit(object, Object.keys(schema));
   }
 }

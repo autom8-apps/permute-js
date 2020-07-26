@@ -1,15 +1,15 @@
-import { SchemaType } from "../interfaces";
+import { Schema, ISettings } from "../interfaces";
 
-const Variant = {
+const VariantSchema = {
   id: String,
   price: String,
   title: String,
   compareAtPrice: [String, null],
   available: Boolean,
   selectedOptions: Array,
-}
+} as Schema
 
-const Product = {
+const ProductSchema = {
     id: String,
     title: String,
     handle: String,
@@ -17,10 +17,19 @@ const Product = {
     productType: String,
     onlineStoreUrl: String,
     images: [Object],
-    variants: Variant,
+    variants: VariantSchema,
     vendor: String,
-}
+} as Schema
 
+export const Product: ISettings = {
+  uid: "id",
+  childrenUid: "id",
+  schema: ProductSchema,
+  map: [
+    {
+      from: "availableForSale",
+      to: "available",
+    }
+  ],
+};
 
-export const VariantEntity = Variant as SchemaType;
-export const ProductEntity = Product as SchemaType;

@@ -1,14 +1,16 @@
-import { LoDashStatic } from "lodash";
-import * as lodash from "lodash";
-import { SchemaType } from "./interfaces";
+import * as _ from "lodash";
 import { Cleaner } from "./index";
-import { ProductEntity } from "./mocks/entities";
+import { Product } from "./mocks/entities";
 
 describe("Cleaner", () => {
-  let object = {
-    name: "jeb",
-    asd: "test"
-  }
-  let schema: SchemaType = ProductEntity;
-  Object
+  const cleaner = new Cleaner(_);
+  it("should omit name from object props and keep title", () => {
+    const object = {
+      name: "jeb",
+      title: "test"
+    }
+    // @ts-ignore
+    expect(cleaner.operate(object, Product).name).toBeUndefined();
+  });
+
 });
