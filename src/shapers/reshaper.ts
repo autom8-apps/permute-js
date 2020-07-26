@@ -1,20 +1,14 @@
-import { IObjectOperation, SchemaType, SchemaTypeSettings, ISettings, IModel, IModelDictionary } from "./interfaces";
+import { IObjectOperation, ISettings, IModelDictionary } from "./interfaces";
 
 export class ReShaper implements IObjectOperation {
-  private readonly schema: SchemaType;
-  private readonly settings: ISettings;
-
+  private settings: ISettings;
   private output: IModelDictionary;
   private object: object;
 
-  constructor(options: SchemaTypeSettings, object: object) {
-    this.schema = options.schema;
-    this.object = object
-    this.settings = options.settings;
-  }
-
-  operate() {
+  operate(object: object, settings: ISettings): IModelDictionary {
     try {
+      this.object = object;
+      this.settings = settings;
       return this.build();
     } catch (error) {
       console.error("Object Shaper", error);
@@ -22,7 +16,7 @@ export class ReShaper implements IObjectOperation {
   }
 
   notChildResource(formattedKey: string, unformattedItem: object): boolean {
-    return this.schema[formattedKey] && !Array.isArray(unformattedItem[formattedKey]);
+    return this.settings.schema[formattedKey] && !Array.isArray(unformattedItem[formattedKey]);
   }
 
   notRelatableCollection(unformattedItem: object): boolean {
@@ -76,15 +70,21 @@ export class ReShaper implements IObjectOperation {
     );
   }
 
-  mapKeys() {
+  get canMap(): boolean {
+    return this.settings.map && Array.isArray(!this.settings.map) && this.settings.map.length > 0;
+  }
+
+  mapKeys(): void {
+    if (!this.canMap) return;
+
     const { map } = this.settings;
     const formatted = {};
     for (const { from, to } of map) {
-      if (this.schema[to]) {
+      if (this.settings.schema[to]) {
         formatted[to] = this.object[from];
       }
     }
 
-    this.object = Object.keys(formatted);
+    this.object = formatted;
   }
 }

@@ -1,16 +1,20 @@
 
-import { ProductEntity } from "../operations/mocks/entities";
-import { Shape } from "../operations/index";
+import { ProductEntity } from "../shapers/mocks/entities";
+import { ISettings } from "../shapers/interfaces";
+import { Shape } from "../index";
 
-export var Product = async (product: Object) => {
-  let options = Object.freeze({
-    unformatted: product,
-    type: ProductEntity,
-    settings: {
-      validate: true,
-      clean: true,
-    },
-  });
+export const Product = (product: Object) => {
+  let options: ISettings = {
+    uid: "id",
+    childrenUid: "id",
+    schema: ProductEntity,
+    map: [
+      {
+        from: "availableForSale",
+        to: "available",
+      }
+    ],
+  };
 
-  return await Shape(options);
+  return Shape(product, options);
 }

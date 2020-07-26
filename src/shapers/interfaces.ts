@@ -1,25 +1,23 @@
 export interface IObjectOperation {
-  operate: (object?: Object, schema?: Object) => Object,
+  operate: (object: object, settings ?: ISettings) => Object|IModelDictionary,
+}
+
+export interface IStrategy {
+  setStrategy: (strategy: IObjectOperation) => void
+  operate: (object: object, settings?: ISettings) => Object | IModelDictionary,
 }
 
 export interface SchemaType {
   [key: string]: Function|object|null
 }
 
+export interface SchemaError {
+  [key: string]: string;
+}
+
 export interface SchemaTypeSettings {
   schema: SchemaType
   settings?: ISettings
-}
-
-export interface ICompositeOptions {
-  formatters: IObjectOperation[]
-  schema: SchemaType,
-  object: Object,
-  settings?: ISettings
-}
-
-export interface IComposite {
-  constructor: (options: ICompositeOptions) => Object
 }
 
 export interface Validator {
@@ -32,16 +30,22 @@ export interface LengthValidator extends Validator {
   max: Number,
 }
 
-interface ISettingsMapPoint {
+export interface ISettingsMapPoint {
   from: string
   to: string
 }
 
+export interface IObjectOperationDictionary {
+  [key: string]: IObjectOperation
+}
+
 export interface ISettings {
+  schema: SchemaType
   map?: ISettingsMapPoint[]
   validate?: boolean
   uid?: string
   childrenUid?: string
+  clean?: boolean
 }
 
 export interface IModel {

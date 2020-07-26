@@ -16,11 +16,11 @@ const Product = {
     availableForSale: Boolean,
     productType: String,
     onlineStoreUrl: String,
-    images: Array,
-    variants: [Variant],
+    images: [Object],
+    variants: Variant,
     vendor: String,
 }
 
 
-export const VariantEntity = new Object(Variant) as SchemaType;
-export const ProductEntity = new Object(Product) as SchemaType;
+export const VariantEntity = Variant as SchemaType;
+export const ProductEntity = Product as SchemaType;

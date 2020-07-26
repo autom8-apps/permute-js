@@ -1,34 +1,33 @@
 // @ts-check
-import { IObjectOperation, SchemaType } from "./interfaces";
+import { IObjectOperation, ISettings, SchemaType, SchemaError } from "./interfaces";
 import { LoDashStatic } from "lodash";
 
 export class Validator implements IObjectOperation {
-  private readonly errors: FunctionConstructor[];
   private readonly _: LoDashStatic;
 
   constructor(_: LoDashStatic) {
     this._ = _;
   }
 
-  operate(object: Object, schema: SchemaType): Object {
+  operate(object: object, { schema }: ISettings): Object {
     try {
-      this.validate(object, schema);
+      const errors: SchemaError|{} = this.validate(object, schema);
 
-      if (Object.keys(this.errors).length > 0) {
-        throw new Error("VALIDATION ERROR OCCURED. SEE REASON WHY BELOW:");
+      if (Object.keys(errors).length > 0) {
+        throw new Error(errors.toString());
       }
 
       return object;
-    } catch (error) {
-      console.error(error);
-      console.table(this.buildErrorString());
+    } catch (errors) {
+      console.error("VALIDATION ERROR OCCURED.SEE REASON WHY BELOW:");
+      console.table(this.buildErrorString(errors));
     }
   }
 
-  buildErrorString(): String|undefined {
-    if (!this.errors) return;
+  buildErrorString(errors: FunctionConstructor[]): String|undefined {
+    if (!errors) return;
     const incorrecttypes = (T: FunctionConstructor) => (`!= ${T.name}`);
-    return `value: ${this.errors.map(incorrecttypes).join("or")}`;
+    return `value: ${errors.map(incorrecttypes).join("or")}`;
   }
 
   isOptionalWithValue(type: FunctionConstructor | null, value: any) {
@@ -57,6 +56,12 @@ export class Validator implements IObjectOperation {
     return this._.isPlainObject(type) && this.isCollection(subject);
   }
 
+  buildError(key:string, type: FunctionConstructor): string {
+    return this._.isObject(type)
+      ? `${key} should be ${type.name}`
+      : `${key} should be ${type}`;
+  }
+
   /**
    * some people might see this and think, "you're not validating every object"
    *
@@ -66,15 +71,18 @@ export class Validator implements IObjectOperation {
    * @param object
    * @param schema
    */
-  validate(object: Object, schema: SchemaType|FunctionConstructor): void {
+  validate(object: object, schema: SchemaType|FunctionConstructor): SchemaError|{} {
+    const errors: SchemaError = {};
     for (const key in schema) {
       if (this.isChild(schema[key], object[key])) {
         this.validate(object[key][0], schema[key]);
       }
 
       if (!this.isValid(schema[key], object[key])) {
-        this.errors.push(schema[key]);
+        errors[key] = this.buildError(key, schema[key]);
       }
     }
+
+    return errors;
   }
 }
