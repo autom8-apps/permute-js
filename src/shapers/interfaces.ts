@@ -9,6 +9,10 @@ export interface LodashUtils {
   isObject: Function
   omit: Function
   hasIn: Function
+  zipObject: Function
+  pick: Function
+  mapKeys: Function
+  merge: Function
 }
 
 export interface IStrategy {
@@ -18,7 +22,11 @@ export interface IStrategy {
 }
 
 export interface Schema {
-  [key: string]: Function|object|null
+  [key: string]: SchemaType
+}
+
+export interface SchemaType {
+  [key: string]: Function | object | null
   children?: string[]
 }
 
@@ -57,11 +65,6 @@ export interface ISettings {
   uid?: string
   childrenUid?: string
   clean?: boolean
-}
-
-export interface IModel {
-  hasMany?: string[]
-  belongsTo?: string
 }
 
 export interface IModelDictionary {

@@ -1,12 +1,11 @@
-import { IObjectOperation, ISettings, IObjectOperationDictionary, Schema, IStrategy, LodashUtils } from "./interfaces";
+import { IObjectOperation, ISettings, IObjectOperationDictionary, IStrategy, LodashUtils } from "./interfaces";
+import { Shaper } from "./shaper";
 
-export class ShaperStrategy implements IObjectOperation, IStrategy {
+export class ShaperStrategy extends Shaper implements IObjectOperation, IStrategy {
   private strategies: IObjectOperationDictionary
-  private output: Object;
-  private _: LodashUtils;
 
   constructor(_: LodashUtils) {
-    this._ = _;
+    super(_);
   }
 
   setStrategy(Strategy: IObjectOperation) {
@@ -22,31 +21,18 @@ export class ShaperStrategy implements IObjectOperation, IStrategy {
   }
 
   format(collection: object[], key: string, settings: ISettings): void {
-    let formatted = {};
-    for (const resource of collection) {
-      let shaped = resource;
-      for (const classKey in this.strategies) {
-        settings.current = key;
-        shaped = this.strategies[classKey].operate(shaped, settings);
-      }
-
-      formatted[shaped[settings.uid]] = shaped;
+    for (const classKey in this.strategies) {
+      settings.current = key;
+      this.output = this.strategies[classKey].operate(
+        collection,
+        settings
+      );
     }
-
-    this.output[key] = formatted;
-  }
-
-  isCollection(object: any, schema: any) {
-    return object && Array.isArray(object) && this._.isPlainObject(schema);
   }
 
   operate(object: object, settings: ISettings): object {
-    for (const key in settings.schema) {
-      if (this.isCollection(object[key], settings.schema[key])) {
-        this.format(object[key], key, settings);
-      }
-
-      this.output[key] = this.format(object[key], key, settings);
+    for (const key in object) {
+      this.format(object[key], key, settings);
     }
 
     return this.output;

@@ -1,8 +1,8 @@
-import { omit, isObject, isPlainObject, once, hasIn } from "lodash";
+import { omit, isObject, isPlainObject, once, hasIn, zipObject, pick, mapKeys, merge } from "lodash";
 import { Validator, Cleaner, ReShaper, ShaperStrategy } from "./shapers/index";
 import { LodashUtils, IOperation, IStrategy } from "./shapers/interfaces";
 
-const _: LodashUtils = Object.freeze({ omit, isObject, isPlainObject, hasIn });
+const _: LodashUtils = Object.freeze({ omit, isObject, isPlainObject, hasIn, zipObject, pick, mapKeys, merge });
 
 const StrategySingleton = once(() => {
   const strategy: IStrategy = new ShaperStrategy(_);

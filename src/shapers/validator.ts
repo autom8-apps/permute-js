@@ -1,21 +1,21 @@
 import { IObjectOperation, ISettings, Schema, SchemaError, LodashUtils } from "./interfaces";
+import { Shaper } from "./shaper";
 
-export class Validator implements IObjectOperation {
-  private readonly _: LodashUtils;
-
+export class Validator extends Shaper implements IObjectOperation {
   constructor(_: LodashUtils) {
-    this._ = _;
+    super(_);
   }
 
-  operate(object: object, { schema }: ISettings): Object {
+  operate(resource: object[], { schema }: ISettings): object {
     try {
-      const errors: SchemaError|{} = this.validate(object, schema);
+      let errors: SchemaError;
+      this.validate(resource, schema, errors);
 
-      if (Object.keys(errors).length > 0) {
+      if (errors && Object.keys(errors).length > 0) {
         throw new Error(errors.toString());
       }
 
-      return object;
+      return resource;
     } catch (errors) {
       console.error("VALIDATION ERROR OCCURED.SEE REASON WHY BELOW:");
       console.table(this.buildErrorString(errors));
@@ -38,20 +38,20 @@ export class Validator implements IObjectOperation {
     return !this._.isObject(type) || (Array.isArray(type) && type.includes(null));
   }
 
-  isObjectType(value: any, type: FunctionConstructor) {
-    return type.name === new Object(value).constructor.name;
+  isType(value: any, type: FunctionConstructor) {
+    return type.name === new Object(value).constructor.name
   }
 
-  isValid(type: FunctionConstructor|null, value: string) {
+  isObjectType(value: any, type: FunctionConstructor) {
+    return (Array.isArray(value) && this.isType(value[1], type)) || this.isType(value, type);
+  }
+
+  isValid(type: FunctionConstructor|null, value: any) {
     return this.isOptional(type) || this.isObjectType(value, type)
   }
 
-  isCollection(subject: any) {
-    return (Array.isArray(subject) && this._.isPlainObject(subject[0]));
-  }
-
   isChild(type: any, subject: any) : boolean {
-    return this._.isPlainObject(type) && this.isCollection(subject);
+    return this._.isPlainObject(type) && this.isCollection(subject, type);
   }
 
   buildError(key:string, type: FunctionConstructor): string {
@@ -60,23 +60,11 @@ export class Validator implements IObjectOperation {
       : `${key} should be ${type}`;
   }
 
-  /**
-   * some people might see this and think, "you're not validating every object"
-   *
-   * If you're working with an array of object that aren't all the same types and aren't
-   * all the same shape for that type, you've got bigger problems on your hands.
-   *
-   * @param object
-   * @param schema
-   */
-  validate(object: object, schema: Schema|FunctionConstructor): SchemaError|{} {
-    const errors: SchemaError = {};
-    for (const key in schema) {
-      if (this.isChild(schema[key], object[key])) {
-        this.validate(object[key][0], schema[key]);
-      }
-
-      if (!this.isValid(schema[key], object[key])) {
+  validate(resource: any, schema: Schema | FunctionConstructor, errors: SchemaError): SchemaError|undefined {
+    for (const key in resource) {
+      if (this.isResource(schema[key], resource[key])) this.validate(resource[key], schema[key], errors);
+      if (this.isChild(schema[key], resource[key])) this.validate(resource[key][0], schema[key], errors);
+      if (!this.isValid(schema[key], resource[key])) {
         errors[key] = this.buildError(key, schema[key]);
       }
     }
