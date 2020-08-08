@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "esModuleInterop": true,
+    "types": ["jest", "node"],
     "outDir": "./dist/",
     "noImplicitAny": true,
     "module": "es6",
@@ -14,6 +16,6 @@
   ],
   "exclude": [
     "node_modules",
-    "src/**/*.spec.ts"
-  ],
+    "**/*.spec.ts"
+  ]
 }
