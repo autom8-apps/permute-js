@@ -9,27 +9,23 @@ export class Validator extends SchemaManager implements IObjectOperation {
   operate(data: any, settings: ISettings): object {
     try {
       let errors: string[] = [];
-      let validated: string[] = [];
 
       if (!this.isShapable(settings, data)) return data;
 
       const first = Object.keys(settings.schema)[0];
-      this.validate(
-        data,
-        settings.schema[first],
-        settings,
-        errors,
-        validated
-      );
+      this.validate(data, settings.schema[first], settings, errors);
 
       if (errors && Object.keys(errors).length > 0) {
-        throw new Error(errors.toString());
+        throw new Error(errors.join(","));
       }
 
       return data;
     } catch (errors) {
-      console.error("Smelter.js - VALIDATION ERROR OCCURED: ");
-      console.table(errors);
+      console.error("Permute.js - VALIDATION ERROR OCCURED: ");
+      console.table(
+        errors.message.includes(",")
+          ? errors.split(",")
+          : [errors.message]);
     }
   }
 
@@ -81,20 +77,20 @@ export class Validator extends SchemaManager implements IObjectOperation {
     resource: object,
     schema: object,
     settings: ISettings,
-    errors: string[],
-    validated: string[],
+    errors: string[]
   ): string[]|undefined {
     for (const key in schema) {
       let subject = this.findSchemaValue(resource, key);
-      if (!subject || this.isLibraryAdded(key) || validated.includes(key)) continue;
-      validated.push(key);
 
-      if (this.isResource(subject, settings, key)) {
-        this.validate(subject, settings.schema[key], settings, errors, validated);
-      }
-
-      if (!this.isValid(schema[key], subject)) {
-        errors.push(this.buildError(key, schema[key]));
+      switch (true) {
+        case !subject || this.isLibraryAdded(key):
+          break;
+        case this.isResource(subject, settings, key):
+          this.validate(subject, { ...settings.schema[key] }, settings, errors);
+          break;
+        case !this.isValid(schema[key], subject):
+          errors.push(this.buildError(key, schema[key]));
+          break;
       }
     }
 

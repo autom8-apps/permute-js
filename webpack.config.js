@@ -18,7 +18,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname),
     filename: "index.js",
-    library: 'DataSmelter',
+    library: 'DataPermute',
     libraryTarget: 'umd'
   },
   devServer: {

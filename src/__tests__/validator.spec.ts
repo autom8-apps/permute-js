@@ -76,6 +76,7 @@ describe("Shaper", () => {
 
   describe("buildError", () => {
     it("returns string error message", () => {
+      settings.current = "products"
       expect(validator.buildError("name", String)).toBe("name should be String")
     });
   });

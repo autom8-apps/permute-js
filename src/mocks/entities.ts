@@ -15,7 +15,7 @@ const VariantSchema = {
   title: String,
   compareAtPrice: [String, null],
   available: Boolean,
-  selectedOptions: Array,
+  selectedOptions: [Object],
   products: String,
 } as SchemaType
 
@@ -27,7 +27,7 @@ const ProductSchema = {
     availableForSale: Boolean,
     productType: String,
     onlineStoreUrl: String,
-    images: [Object],
+    images: [String],
     vendor: String,
     variants: [String],
 } as SchemaType

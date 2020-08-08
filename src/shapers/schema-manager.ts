@@ -50,13 +50,15 @@ export abstract class SchemaManager {
     return this._.isPlainObject(resource) && this._.isPlainObject(settings.schema[schemaName])
   }
 
-  isShapable(settings: ISettings, data: object[]) {
-    return this.isCollection(data, settings.schema[settings.current]) ||
-      (this._.isPlainObject(data) && this._.isPlainObject(settings.schema[settings.current]))
-      && !this.isChildResource(settings);
+  isShapable(settings: ISettings, data: object|object[]) {
+    data = Array.isArray(data) ? data : [data];
+    const collection = this.isCollection(data, settings.schema[settings.current]);
+    const child = this.isChildResource(settings);
+
+    return collection && !child;
   }
 
-  isCollection(resource: object[], type: any): boolean {
+  isCollection(resource: object|object[], type: any): boolean {
     return resource && Array.isArray(resource) && this._.isPlainObject(type);
   }
 

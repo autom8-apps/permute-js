@@ -102,14 +102,14 @@ export class ReShaper extends SchemaManager implements IObjectOperation {
   }
 
   format(collection: object[], settings: ISettings): IModelDictionary {
-    const adjustedForPlainObject = Array.isArray(collection) ? collection : [collection];
+    collection = Array.isArray(collection) ? collection : [collection];
     let dictionary: any = {};
     const childKeys = this.childCollectionKeys(collection[0], settings);
 
     if (childKeys.length > 0) {
       dictionary = this._.merge(
         this.reduceChildResources(
-          adjustedForPlainObject,
+          collection,
           settings,
           childKeys
         ),

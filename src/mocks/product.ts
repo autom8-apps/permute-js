@@ -303,9 +303,9 @@ export const productApiResponse = {
 };
 
 const productOne = { ...productApiResponse };
-productOne.id = 1;
+productOne.id = "1";
 const productTwo = { ...productApiResponse };
-productTwo.id = 2;
+productTwo.id = "2";
 const productThree = { ...productApiResponse };
-productThree.id = 3;
+productThree.id = "3";
 export const productCollection = [productOne, productTwo, productThree];

@@ -1,8 +1,12 @@
 import { IObjectOperation, ISettings, IObjectOperationDictionary, IStrategy, LodashUtils } from "./interfaces";
 import { SchemaManager } from "./schema-manager";
+enum STRATEGIES_STRINGS {
+  Validator = "Validator",
+  ReShaper = "ReShaper",
+}
 
 export class ShaperStrategy extends SchemaManager implements IObjectOperation, IStrategy {
-  private strategies: IObjectOperationDictionary
+  private strategies: IObjectOperationDictionary = {};
 
   constructor(_: LodashUtils) {
     super(_);
@@ -20,25 +24,27 @@ export class ShaperStrategy extends SchemaManager implements IObjectOperation, I
     return this.strategies[classKey];
   }
 
-  format(collection: object[], key: string, settings: ISettings): void {
+  validateAndShape(resource: object|object[], settings: ISettings) {
     let output = {};
-    for (const classKey in this.strategies) {
+    for (const key in settings.schema) {
       settings.current = key;
-      output = this.strategies[classKey].operate(
-        collection,
-        settings
+      if (!this.isShapable(settings, resource)) continue;
+      this.getStrategy(STRATEGIES_STRINGS.Validator).operate(resource, settings);
+      output = this._.merge(
+        this.getStrategy(STRATEGIES_STRINGS.ReShaper).operate(resource, settings),
+        output
       );
     }
 
     this.output = this._.merge(output, this.output);
+    return this.output;
   }
 
-  operate(object: object, settings: ISettings): object {
-    for (const key in object) {
-      if (this.isChildResource(settings, object[key])) continue;
-      this.format(object[key], key, settings);
+  operate(resource: object|object[], settings: ISettings): object {
+    try {
+      return this.validateAndShape(resource, settings);
+    } catch (errors) {
+      return errors.split(",");
     }
-
-    return this.output;
   }
 }
