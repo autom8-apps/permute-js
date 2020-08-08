@@ -6,16 +6,25 @@ export class Validator extends Shaper implements IObjectOperation {
     super(_);
   }
 
-  operate(resource: object[], { schema }: ISettings): object {
+  operate(collection: object[], settings: ISettings): object {
     try {
       let errors: SchemaError;
-      this.validate(resource, schema, errors);
+
+      if (!this.isShapable(settings, collection)) return collection;
+
+      if (this.isResource(collection, settings, settings.current)) {
+        this.validate(collection, settings.schema, errors);
+      }
+
+      if (this.isCollection(collection, settings.schema[settings.current])) {
+        this.validate(collection[0], settings.schema, errors);
+      }
 
       if (errors && Object.keys(errors).length > 0) {
         throw new Error(errors.toString());
       }
 
-      return resource;
+      return collection;
     } catch (errors) {
       console.error("VALIDATION ERROR OCCURED.SEE REASON WHY BELOW:");
       console.table(this.buildErrorString(errors));
@@ -46,18 +55,10 @@ export class Validator extends Shaper implements IObjectOperation {
     return (Array.isArray(value) && this.isType(value[1], type)) || this.isType(value, type);
   }
 
-  isLibraryAdded(key: string) {
-    return key === "hasMany" || key === "belongsTo";
-  }
-
   isValid(type: FunctionConstructor|null, value: any, key ?: string) {
     return this.isOptional(type)
       || this.isObjectType(value, type)
       || (key && this.isLibraryAdded(key));
-  }
-
-  isChild(type: any, subject: any) : boolean {
-    return this._.isPlainObject(type) && this.isCollection(subject, type);
   }
 
   buildError(key:string, type: FunctionConstructor): string {
@@ -66,15 +67,29 @@ export class Validator extends Shaper implements IObjectOperation {
       : `${key} should be ${type}`;
   }
 
-  isResource(type: any, subject: any): boolean {
-    return this._.isPlainObject(type) && this._.isPlainObject(subject);
+  isValidatorType(
+    resource: object,
+    schema: Schema | FunctionConstructor,
+    settings: ISettings,
+    key: string
+  ): boolean {
+    return (schema[key] && resource[key] || resource[key] && schema[settings.current][key]) && !Array.isArray(schema[key]);
   }
 
-  validate(resource: any, schema: Schema | FunctionConstructor, errors: SchemaError): SchemaError|undefined {
-    for (const key in resource) {
-      if (this.isResource(schema[key], resource[key])) this.validate(resource[key], schema[key], errors);
-      if (this.isChild(schema[key], resource[key])) this.validate(resource[key][0], schema[key], errors);
-      if (!this.isValid(schema[key], resource[key], key)) {
+  validate(resource: object, schema: Schema | FunctionConstructor, settings: ISettings, errors: SchemaError): SchemaError|undefined {
+    for (const key in schema) {
+      if (this.isCollection(schema[key], resource[key])) {
+        this.validate(resource[key][0], schema[key], settings, errors);
+      }
+
+      if (this.isResource(resource[key], settings, key)) {
+        this.validate(resource[key][0], schema[key], settings, errors);
+      }
+
+      if (
+        this.isValidatorType(schema[key], resource[key], settings, key) &&
+        !this.isValid(schema[key], resource[key], key)
+      ) {
         errors[key] = this.buildError(key, schema[key]);
       }
     }
