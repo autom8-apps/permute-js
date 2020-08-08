@@ -17,11 +17,30 @@ Since I am primarily a Vue.js developer I will be providing example use cases of
 ```js
 async GET_PRODUCTS({ commit }) {
   const schema = {
-    product
-    title: String,
-    description: String,
-    tags: Array,
-  }
+    product: {
+      _uid: "id",
+      id: String,
+      title: String,
+      handle: String,
+      availableForSale: Boolean,
+      productType: String,
+      onlineStoreUrl: String,
+      images: [String],
+      vendor: String,
+      variants: [String],
+    },
+    variants: {
+      _uid: "id",
+      id: String,
+      price: String,
+      title: String,
+      compareAtPrice: [String, null],
+      available: Boolean,
+      selectedOptions: [Object],
+      products: String,
+    }
+  };
+
 
   const res = await fetch("https://api.com/products");
   const { products } = await res.json();
