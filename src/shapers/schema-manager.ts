@@ -1,6 +1,6 @@
-import { LodashUtils, ISettings } from "./interfaces";
+import { LodashUtils, ISettings, Schema } from "./interfaces";
 
-export abstract class Shaper {
+export abstract class SchemaManager {
   protected output: object;
   protected readonly _: LodashUtils;
 
@@ -23,6 +23,20 @@ export abstract class Shaper {
           && Object.is(settings.schema[settings.current][key], String);
       })
     }).length > 0;
+  }
+
+  findSchemaValue(value: Object, subject: string): object[]|Object {
+    for (const key of Object.keys(value)) {
+      if (value[subject]) {
+        return value[subject];
+      }
+
+      if (this._.isObject(value[key]) && value[key][subject]) {
+        return value[key][subject];
+      }
+
+      this.findSchemaValue(value[key], subject);
+    }
   }
 
   isResource(resource: any, settings: ISettings, schemaName: string) {

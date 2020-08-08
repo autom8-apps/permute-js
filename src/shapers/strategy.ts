@@ -1,12 +1,12 @@
 import { IObjectOperation, ISettings, IObjectOperationDictionary, IStrategy, LodashUtils } from "./interfaces";
-import { Shaper } from "./shaper";
+import { SchemaManager } from "./schema-manager";
 
 /**
  * A property that is already an object and not a collection at the root level is assumed
  * to be already normalized therefore no operation is taken.
  */
 
-export class ShaperStrategy extends Shaper implements IObjectOperation, IStrategy {
+export class ShaperStrategy extends SchemaManager implements IObjectOperation, IStrategy {
   private strategies: IObjectOperationDictionary
 
   constructor(_: LodashUtils) {

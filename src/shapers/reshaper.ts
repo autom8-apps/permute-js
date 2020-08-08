@@ -1,7 +1,7 @@
 import { IObjectOperation, ISettings, LodashUtils, SchemaType, IModelDictionary } from "./interfaces";
-import { Shaper } from "./shaper";
+import { SchemaManager } from "./schema-manager";
 
-export class ReShaper extends Shaper implements IObjectOperation {
+export class ReShaper extends SchemaManager implements IObjectOperation {
   constructor(_: LodashUtils) {
     super(_);
   }
