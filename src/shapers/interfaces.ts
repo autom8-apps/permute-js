@@ -28,17 +28,7 @@ export interface Schema {
 
 export interface SchemaType {
   _uid: string;
-
-  // added automatically after formatting
-  belongsTo?: SchemaType;
-
-  // added automatically after formatting
-  hasMany?: SchemaType;
   [key: string]: Function | FunctionConstructor | StringConstructor | ArrayConstructor | ObjectConstructor | NumberConstructor | object | null | any
-}
-
-export interface SchemaError {
-  [key: string]: string;
 }
 
 export interface Validator {

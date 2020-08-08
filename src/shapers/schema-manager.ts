@@ -1,4 +1,5 @@
 import { LodashUtils, ISettings, Schema } from "./interfaces";
+import { indexOf } from "lodash";
 
 export abstract class SchemaManager {
   protected output: object;
@@ -8,6 +9,10 @@ export abstract class SchemaManager {
     this._ = _;
   }
 
+  isFirstSchemaType(key: string, schema: object): boolean {
+    return Object.keys(schema).indexOf(key) === 1;
+  }
+
   childCollectionKeys(resource: object, settings: ISettings): string[] {
     return Object.keys(resource).filter((i) =>
       this.isCollection(resource[i], settings.schema[i])
@@ -15,27 +20,29 @@ export abstract class SchemaManager {
   }
 
   isChildResource(settings: ISettings) {
-    return this._.isPlainObject(settings.schema[settings.current]) &&
-      Object.keys(settings.schema).filter((key) => {
-      return Object.keys(settings.schema).find(k => {
-        return settings.schema[k][settings.current] &&
-          Array.isArray(settings.schema[k][settings.current])
-          && Object.is(settings.schema[settings.current][key], String);
-      })
-    }).length > 0;
+    return this._.isPlainObject(settings.schema[settings.current]) && Object.keys(settings.schema).find(key => {
+      const childProp = settings.schema[key][settings.current];
+      return childProp && Array.isArray(childProp) && childProp.length && childProp[0].name === "String"
+    }) !== undefined;
   }
 
-  findSchemaValue(value: Object, subject: string): object[]|Object {
-    for (const key of Object.keys(value)) {
-      if (value[subject]) {
-        return value[subject];
+  getResource(resource: any) {
+    if (Array.isArray(resource)) {
+      return resource[0];
+    }
+
+    return resource;
+  }
+
+  findSchemaValue(resource: Object, currentSchemaKey: string): object|FunctionConstructor|null {
+    for (const key of Object.keys(resource)) {
+      if (resource[currentSchemaKey]) {
+        return this.getResource(resource[currentSchemaKey]);
       }
 
-      if (this._.isObject(value[key]) && value[key][subject]) {
-        return value[key][subject];
+      if (this._.isObject(resource[key]) && resource[key][currentSchemaKey]) {
+        return this.getResource(resource[key][currentSchemaKey]);
       }
-
-      this.findSchemaValue(value[key], subject);
     }
   }
 

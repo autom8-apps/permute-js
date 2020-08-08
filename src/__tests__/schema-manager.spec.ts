@@ -74,7 +74,6 @@ describe("SchemaManager", () => {
   });
 
   it("findSchemaValue -- should return nested value if found", () => {
-    reshaper.findSchemaValue({ products: productApiResponse }, "variants").toBeDefined();
+    expect(reshaper.findSchemaValue({ products: productApiResponse }, "variants")).toBeDefined();
   });
-
 });

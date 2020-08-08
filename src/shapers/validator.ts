@@ -1,4 +1,4 @@
-import { IObjectOperation, ISettings, Schema, SchemaError, LodashUtils } from "./interfaces";
+import { IObjectOperation, ISettings, Schema, LodashUtils, SchemaType } from "./interfaces";
 import { SchemaManager } from "./schema-manager";
 
 export class Validator extends SchemaManager implements IObjectOperation {
@@ -6,35 +6,31 @@ export class Validator extends SchemaManager implements IObjectOperation {
     super(_);
   }
 
-  operate(collection: object[], settings: ISettings): object {
+  operate(data: any, settings: ISettings): object {
     try {
-      let errors: SchemaError;
+      let errors: string[] = [];
+      let validated: string[] = [];
 
-      if (!this.isShapable(settings, collection)) return collection;
+      if (!this.isShapable(settings, data)) return data;
 
-      if (this.isResource(collection, settings, settings.current)) {
-        this.validate(collection, settings.schema, settings, errors);
-      }
-
-      if (this.isCollection(collection, settings.schema[settings.current])) {
-        this.validate(collection[0], settings.schema, settings, errors);
-      }
+      const first = Object.keys(settings.schema)[0];
+      this.validate(
+        data,
+        settings.schema[first],
+        settings,
+        errors,
+        validated
+      );
 
       if (errors && Object.keys(errors).length > 0) {
         throw new Error(errors.toString());
       }
 
-      return collection;
+      return data;
     } catch (errors) {
-      console.error("VALIDATION ERROR OCCURED.SEE REASON WHY BELOW:");
-      console.table(this.buildErrorString(errors));
+      console.error("Smelter.js - VALIDATION ERROR OCCURED: ");
+      console.table(errors);
     }
-  }
-
-  buildErrorString(errors: FunctionConstructor[]): String|undefined {
-    if (!errors) return;
-    const incorrecttypes = (T: FunctionConstructor) => (`!= ${T.name}`);
-    return `value: ${errors.map(incorrecttypes).join("or")}`;
   }
 
   isOptionalWithValue(type: FunctionConstructor | null, value: any) {
@@ -66,59 +62,42 @@ export class Validator extends SchemaManager implements IObjectOperation {
   }
 
   isValid(type: FunctionConstructor|null, value: any): boolean {
-    if (this.isOptional(type) && Array.isArray(type)) {
+    if (!this.isOptional(type) && Array.isArray(type)) {
       return this.isValidMany(type, value);
     }
 
     return this.isOptional(type) || this.isObjectType(value, type)
   }
 
-  buildError(key:string, type: FunctionConstructor): string {
-    return this._.isObject(type)
-      ? `${key} should be ${type.name}`
-      : `${key} should be ${type}`;
+  buildError(key:string, type: SchemaType): string {
+    return `${key} should be ${type.name}`;
   }
 
-  isValidatorType(
-    resource: object,
-    schema: Schema | FunctionConstructor,
-    settings: ISettings,
-    key: string
-  ): boolean {
-    return (schema[key] &&
-           resource[key] ||
-           resource[key] &&
-           schema[settings.current][key]) &&
-           !Array.isArray(schema[key]);
+  isLibraryAdded(key: string) {
+    return ["_uid"].includes(key);
   }
 
   validate(
     resource: object,
-    schema: Schema | FunctionConstructor,
+    schema: object,
     settings: ISettings,
-    errors: SchemaError
-  ): SchemaError|undefined {
-    const subject = this.findSchemaValue(resource, settings.current);
-
-    if (!subject) return;
-
+    errors: string[],
+    validated: string[],
+  ): string[]|undefined {
     for (const key in schema) {
-      if (this.isCollection(schema[key], subject)) {
-        this.validate(subject[0], schema[key], settings, errors);
+      let subject = this.findSchemaValue(resource, key);
+      if (!subject || this.isLibraryAdded(key) || validated.includes(key)) continue;
+      validated.push(key);
+
+      if (this.isResource(subject, settings, key)) {
+        this.validate(subject, settings.schema[key], settings, errors, validated);
       }
 
-      if (this.isResource(resource[key], settings, key)) {
-        this.validate(resource[key][0], schema[key], settings, errors);
-      }
-
-      if (
-        this.isValidatorType(schema[key], resource[key], settings, key) &&
-        !this.isValid(schema[key], resource[key])
-      ) {
-        errors[key] = this.buildError(key, schema[key]);
+      if (!this.isValid(schema[key], subject)) {
+        errors.push(this.buildError(key, schema[key]));
       }
     }
 
-    return errors;
+    if (errors.length > 0) return errors;
   }
 }
