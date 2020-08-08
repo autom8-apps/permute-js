@@ -1,6 +1,11 @@
 import { IObjectOperation, ISettings, IObjectOperationDictionary, IStrategy, LodashUtils } from "./interfaces";
 import { Shaper } from "./shaper";
 
+/**
+ * A property that is already an object and not a collection at the root level is assumed
+ * to be already normalized therefore no operation is taken.
+ */
+
 export class ShaperStrategy extends Shaper implements IObjectOperation, IStrategy {
   private strategies: IObjectOperationDictionary
 
@@ -21,13 +26,16 @@ export class ShaperStrategy extends Shaper implements IObjectOperation, IStrateg
   }
 
   format(collection: object[], key: string, settings: ISettings): void {
+    let output = {};
     for (const classKey in this.strategies) {
       settings.current = key;
-      this.output = this.strategies[classKey].operate(
+      output = this.strategies[classKey].operate(
         collection,
         settings
       );
     }
+
+    this.output = this._.merge(output, this.output);
   }
 
   operate(object: object, settings: ISettings): object {

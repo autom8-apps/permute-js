@@ -1,10 +1,11 @@
 import { ISettings } from "../shapers/interfaces";
-import { productApiResponse } from "../shapers/mocks/product";
+import { productApiResponse } from "../mocks/product";
 import { validate } from "../index";
 
 let settings: ISettings = {
   schema: {
     products: {
+      _uid: "id",
       id: String,
       title: String,
       handle: String,
@@ -16,6 +17,7 @@ let settings: ISettings = {
       children: ["variants"],
     },
     variants: {
+      _uid: "id",
       id: String,
       price: String,
       title: String,

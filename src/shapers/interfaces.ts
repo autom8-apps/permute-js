@@ -13,6 +13,7 @@ export interface LodashUtils {
   pick: Function
   mapKeys: Function
   merge: Function
+  flatMap: Function
 }
 
 export interface IStrategy {
@@ -26,8 +27,14 @@ export interface Schema {
 }
 
 export interface SchemaType {
-  [key: string]: Function | object | null
-  children?: string[]
+  _uid: string;
+
+  // added automatically after formatting
+  belongsTo?: SchemaType;
+
+  // added automatically after formatting
+  hasMany?: SchemaType;
+  [key: string]: Function | FunctionConstructor | StringConstructor | ArrayConstructor | ObjectConstructor | NumberConstructor | object | null | any
 }
 
 export interface SchemaError {
@@ -68,5 +75,5 @@ export interface ISettings {
 }
 
 export interface IModelDictionary {
-  [key: string]: IModel
+  [key: string]: {}
 }

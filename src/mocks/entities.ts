@@ -1,15 +1,26 @@
-import { Schema, ISettings } from "../interfaces";
+import { SchemaType, ISettings } from "../shapers/interfaces";
+
+const ProductImageSchema = {
+  _uid: "id",
+  id: String,
+  src: String,
+  altText: String,
+  products: String,
+}
 
 const VariantSchema = {
+  _uid: "id",
   id: String,
   price: String,
   title: String,
   compareAtPrice: [String, null],
   available: Boolean,
   selectedOptions: Array,
-} as Schema
+  products: String,
+} as SchemaType
 
 const ProductSchema = {
+    _uid: "id",
     id: String,
     title: String,
     handle: String,
@@ -17,19 +28,15 @@ const ProductSchema = {
     productType: String,
     onlineStoreUrl: String,
     images: [Object],
-    variants: VariantSchema,
     vendor: String,
-} as Schema
+    variants: [String],
+} as SchemaType
 
 export const Product: ISettings = {
-  uid: "id",
-  childrenUid: "id",
-  schema: ProductSchema,
-  map: [
-    {
-      from: "availableForSale",
-      to: "available",
-    }
-  ],
+  schema: {
+    products: ProductSchema,
+    variants: VariantSchema,
+    images: ProductImageSchema
+  },
 };
 

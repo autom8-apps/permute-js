@@ -1,13 +1,16 @@
 {
-  "name": "schm-normalizr",
+  "name": "smelter-js",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A simple frontend data manager for normalizing and validating data to help promote a more 'immutable' API for frontend applications that rely on mutuable data structures.",
+  "main": "/dist/index.js",
+  "typings": "index.d.ts",
   "scripts": {
+    "compile": "tsc",
     "build": "webpack --progress --colors",
     "start": "webpack-dev-server --progress --colors",
     "todo": "./node_modules/.bin/todo",
-    "test": "jest"
+    "test": "jest",
+    "debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "author": "",
   "license": "ISC",

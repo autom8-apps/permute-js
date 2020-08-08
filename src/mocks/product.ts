@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const productApiResponse = {
   id: "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0LzI0NDIxNDMzNjcyNDc=",
   availableForSale: true,
@@ -53,36 +54,6 @@ export const productApiResponse = {
           implementsNode: false,
         },
       },
-      presentmentPrices: [
-        {
-          price: {
-            amount: "15.0",
-            currencyCode: "USD",
-            type: {
-              name: "MoneyV2",
-              kind: "OBJECT",
-              fieldBaseTypes: {
-                amount: "Decimal",
-                currencyCode: "CurrencyCode",
-              },
-              implementsNode: false,
-            },
-          },
-          compareAtPrice: null,
-          type: {
-            name: "ProductVariantPricePair",
-            kind: "OBJECT",
-            fieldBaseTypes: { compareAtPrice: "MoneyV2", price: "MoneyV2" },
-            implementsNode: false,
-          },
-          nextPageQueryAndPath: {
-            _custom: { type: "function", display: "<span>ƒ</span> ()" },
-          },
-          hasNextPage: false,
-          hasPreviousPage: false,
-          variableValues: { first: 50 },
-        },
-      ],
       weight: 7,
       available: true,
       sku: "2018333186",
@@ -330,3 +301,11 @@ export const productApiResponse = {
   hasPreviousPage: false,
   variableValues: { first: 50 },
 };
+
+const productOne = { ...productApiResponse };
+productOne.id = 1;
+const productTwo = { ...productApiResponse };
+productTwo.id = 2;
+const productThree = { ...productApiResponse };
+productThree.id = 3;
+export const productCollection = [productOne, productTwo, productThree];

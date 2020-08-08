@@ -1,7 +1,8 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: './src/factory.ts',
+  mode: 'development',
   module: {
     rules: [
       {
@@ -12,15 +13,16 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.ts', '.js'],
   },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname),
+    filename: "index.js",
+    library: 'DataSmelter',
+    libraryTarget: 'umd'
   },
   devServer: {
-    contentBase: './dist'
+    contentBase: './'
   },
-  devtool: 'inline-source-map',
   watch: true
 };

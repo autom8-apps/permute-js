@@ -1,4 +1,4 @@
-import { ISettings, LodashUtils } from "./interfaces";
+import { LodashUtils, ISettings } from "./interfaces";
 
 export abstract class Shaper {
   protected output: object;
@@ -8,19 +8,51 @@ export abstract class Shaper {
     this._ = _;
   }
 
+  childCollectionKeys(resource: object, settings: ISettings): string[] {
+    return Object.keys(resource).filter((i) =>
+      this.isCollection(resource[i], settings.schema[i])
+    );
+  }
+
+  isChildResource(settings: ISettings) {
+    return this._.isPlainObject(settings.schema[settings.current]) &&
+      Object.keys(settings.schema).filter((key) => {
+      return Object.keys(settings.schema).find(k => {
+        return settings.schema[k][settings.current] &&
+          Array.isArray(settings.schema[k][settings.current])
+          && Object.is(settings.schema[settings.current][key], String);
+      })
+    }).length > 0;
+  }
+
+  isResource(resource: any, settings: ISettings, schemaName: string) {
+    return this._.isPlainObject(resource) && this._.isPlainObject(settings.schema[schemaName])
+  }
+
+  isShapable(settings: ISettings, data: object[]) {
+    return this.isCollection(data, settings.schema[settings.current]) ||
+      (this._.isPlainObject(data) && this._.isPlainObject(settings.schema[settings.current]))
+      && !this.isChildResource(settings);
+  }
+
   isCollection(resource: object[], type: any): boolean {
     return resource && Array.isArray(resource) && this._.isPlainObject(type);
   }
 
-  uid(id: string): string {
-    return id || "id";
+  uids(collection: object[], settings: ISettings, name: string) {
+    if (!settings.schema[name] || !settings.schema[name]._uid) throw new Error("All entities should specify _uid");
+    if (this._.isPlainObject(collection)) {
+      return collection[settings.schema[name]._uid].toString()
+    }
+    return collection.map((r) => {
+      return r[settings.schema[name]._uid].toString()
+    });
   }
 
-  isResource(type: any, subject: any): boolean {
-    return this._.isPlainObject(type) && this._.isPlainObject(subject);
-  }
-
-  pickChildren(currentResource: object, childKeys: string[]) {
-    return this._.pick(Object.keys(currentResource), childKeys);
+  pickPlainObject(resource: object, settings: ISettings, schemaName: string): object {
+    return this._.pick(
+      resource,
+      Object.keys(settings.schema[schemaName])
+    );
   }
 }

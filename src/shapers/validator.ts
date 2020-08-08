@@ -35,7 +35,7 @@ export class Validator extends Shaper implements IObjectOperation {
   }
 
   isOptional(type: FunctionConstructor|null) {
-    return !this._.isObject(type) || (Array.isArray(type) && type.includes(null));
+    return !this._.isObject(type) || (Array.isArray(type) && type.includes(null)) || ;
   }
 
   isType(value: any, type: FunctionConstructor) {
@@ -46,8 +46,14 @@ export class Validator extends Shaper implements IObjectOperation {
     return (Array.isArray(value) && this.isType(value[1], type)) || this.isType(value, type);
   }
 
-  isValid(type: FunctionConstructor|null, value: any) {
-    return this.isOptional(type) || this.isObjectType(value, type)
+  isLibraryAdded(key: string) {
+    return key === "hasMany" || key === "belongsTo";
+  }
+
+  isValid(type: FunctionConstructor|null, value: any, key ?: string) {
+    return this.isOptional(type)
+      || this.isObjectType(value, type)
+      || (key && this.isLibraryAdded(key));
   }
 
   isChild(type: any, subject: any) : boolean {
@@ -60,11 +66,15 @@ export class Validator extends Shaper implements IObjectOperation {
       : `${key} should be ${type}`;
   }
 
+  isResource(type: any, subject: any): boolean {
+    return this._.isPlainObject(type) && this._.isPlainObject(subject);
+  }
+
   validate(resource: any, schema: Schema | FunctionConstructor, errors: SchemaError): SchemaError|undefined {
     for (const key in resource) {
       if (this.isResource(schema[key], resource[key])) this.validate(resource[key], schema[key], errors);
       if (this.isChild(schema[key], resource[key])) this.validate(resource[key][0], schema[key], errors);
-      if (!this.isValid(schema[key], resource[key])) {
+      if (!this.isValid(schema[key], resource[key], key)) {
         errors[key] = this.buildError(key, schema[key]);
       }
     }
