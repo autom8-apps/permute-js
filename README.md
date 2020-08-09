@@ -2,7 +2,7 @@
 
 A small low dependency library for normalizing and validating data. This primary goal of this library was to improve data interaction of the frontend and provide a solution for developers, who may not have the ability to work with the API team to get the ideal shape of data, can now quickly normalize that data into formats that best suite their needs rather than shaping their application around less than ideal data structures. This idea was inspired by the Redux community in the following article https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape.
 
-Immutable data structures have been found lower bug density considerably in codebases. However, for most modern frontend developers using reactive frameworks like Vue or React, we are unable to implement immutable data structures in our state management systems because the rendering systems of these frameworks are depdenent upon mutable data structures. This library aims to provide an alternative solution to immutablility by providing normalization and validation middleware to ensure your data is in the shape you need and has the correct values (AKA improving value mutability errors). 
+Immutable data structures have been found to lower bug density considerably. However, for most modern frontend developers using reactive frameworks like Vue or React, we are unable to implement immutable data structures in our state management systems because the rendering systems of these frameworks are depdenent upon mutable data structures. This library aims to provide an alternative solution to immutablility by providing normalization and validation middleware to ensure your data is in the shape you need and always has the values you need (lowered value mutability errors). 
 
 ## Usage
 
