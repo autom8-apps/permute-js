@@ -1,5 +1,5 @@
 {
-  "name": "permute-js",
+  "name": "@thetaproom/permute",
   "version": "1.0.0",
   "description": "A simple frontend data manager for normalizing and validating data to help promote a more 'immutable' API for frontend applications that rely on mutuable data structures.",
   "main": "/dist/main.js",
@@ -8,11 +8,11 @@
     "compile": "tsc",
     "build": "webpack --progress --colors",
     "start": "webpack-dev-server --progress --colors",
-    "todo": "./node_modules/.bin/todo",
+    "todo": "todo",
     "test": "jest",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
-  "author": "",
+  "author": "Jeremiah Wodke <jeremiah@thetaproom.com>",
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.19"
@@ -41,5 +41,26 @@
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-taproom/permute-js.git"
+  },
+  "keywords": [
+    "normalization",
+    "vuex",
+    "state",
+    "management",
+    "redux",
+    "data",
+    "normalization",
+    "validation",
+    "state",
+    "management",
+    "validation"
+  ],
+  "bugs": {
+    "url": "https://github.com/the-taproom/permute-js/issues"
+  },
+  "homepage": "https://github.com/the-taproom/permute-js#readme"
 }
