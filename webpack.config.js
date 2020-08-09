@@ -1,8 +1,8 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/factory.ts',
-  mode: 'development',
+  entry: './src/index.ts',
+  mode: 'production',
   module: {
     rules: [
       {
@@ -16,9 +16,8 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   output: {
-    path: path.resolve(__dirname),
-    filename: "index.js",
-    library: 'DataPermute',
+    path: path.resolve(__dirname) + "/dist",
+    library: 'Permute',
     libraryTarget: 'umd'
   },
   devServer: {

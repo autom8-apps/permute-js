@@ -1,5 +1,4 @@
 import { LodashUtils, ISettings, Schema } from "./interfaces";
-import { indexOf } from "lodash";
 
 export abstract class SchemaManager {
   protected output: object;

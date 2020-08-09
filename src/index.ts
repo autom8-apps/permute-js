@@ -7,6 +7,8 @@ const strategy = new ShaperStrategy(_);
 strategy.setStrategy(new Validator(_));
 strategy.setStrategy(new ReShaper(_));
 
-export function permute(data: object | object[], settings: ISettings) {
+function permute(data: object | object[], settings: ISettings) {
   return strategy.operate(data, settings);
 }
+
+module.exports = permute;
