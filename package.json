@@ -8,7 +8,6 @@
     "compile": "tsc",
     "build": "webpack --progress --colors",
     "start": "webpack-dev-server --progress --colors",
-    "todo": "./node_modules/.bin/todo",
     "test": "jest",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
@@ -21,7 +20,6 @@
     "ts-jest": "^26.1.3",
     "ts-loader": "^8.0.1",
     "typescript": "^3.9.7",
-    "@ripcitydev/todo": "^1.3.8",
     "@types/jest": "^26.0.7",
     "@types/lodash": "^4.14.158",
     "@types/lodash.add": "^3.7.6",
