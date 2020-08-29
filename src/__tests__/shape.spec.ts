@@ -2,7 +2,7 @@
 import { productApiResponse, productCollection } from "../mocks/product";
 import { isPlainObject } from "lodash";
 import { Product } from "../mocks/entities";
-import { permute } from "../index";
+import permute from "../index";
 
 describe("StrategySingleton", () => {
   it("it should validate and reshape an object according to it's schema", () => {

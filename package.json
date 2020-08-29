@@ -8,7 +8,7 @@
     "compile": "tsc",
     "build": "webpack --progress --colors",
     "start": "webpack-dev-server --progress --colors",
-    "todo": "todo",
+    "todo": "./node_modules/.bin/todo",
     "test": "jest",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
