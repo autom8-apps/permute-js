@@ -1,6 +1,6 @@
 {
-  "name": "@thetaproom/permute",
-  "version": "1.0.2",
+  "name": "@autom8/permute",
+  "version": "1.0.0",
   "description": "A simple frontend data manager for normalizing and validating data to help promote a more 'immutable' API for frontend applications that rely on mutuable data structures.",
   "main": "/dist/main.js",
   "typings": "index.d.ts",
@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/the-taproom/permute-js.git"
+    "url": "git+https://github.com//permute-js.git"
   },
   "keywords": [
     "normalization",
@@ -60,7 +60,7 @@
     "validation"
   ],
   "bugs": {
-    "url": "https://github.com/the-taproom/permute-js/issues"
+    "url": "https://github.com/autom8-apps/permute-js/issues"
   },
-  "homepage": "https://github.com/the-taproom/permute-js#readme"
+  "homepage": "https://github.com/autom8-apps/permute-js#readme"
 }
