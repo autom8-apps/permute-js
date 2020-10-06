@@ -1,5 +1,7 @@
-import { IObjectOperation, ISettings, IObjectOperationDictionary, IStrategy, LodashUtils } from "./interfaces";
+import { IObjectOperation, ISettings, IObjectOperationDictionary, IStrategy } from "./interfaces";
 import { SchemaManager } from "./schema-manager";
+import { _ } from "./lodash-utils";
+
 enum STRATEGIES_STRINGS {
   Validator = "Validator",
   ReShaper = "ReShaper",
@@ -8,7 +10,7 @@ enum STRATEGIES_STRINGS {
 export class ShaperStrategy extends SchemaManager implements IObjectOperation, IStrategy {
   private strategies: IObjectOperationDictionary = {};
 
-  constructor(_: LodashUtils) {
+  constructor() {
     super(_);
   }
 
@@ -40,7 +42,7 @@ export class ShaperStrategy extends SchemaManager implements IObjectOperation, I
     return this.output;
   }
 
-  operate(resource: object|object[], settings: ISettings): object {
+  async operate(resource: object|object[], settings: ISettings): Promise<object> {
     try {
       return this.validateAndShape(resource, settings);
     } catch (errors) {

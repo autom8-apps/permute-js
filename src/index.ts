@@ -1,14 +1,18 @@
-const { omit, isObject, isPlainObject, once, hasIn, zipObject, pick, mapKeys, merge, flatMap } = require("lodash");
-const { Validator, ReShaper, ShaperStrategy } = require("./shapers/index");
-const { LodashUtils, ISettings, IStrategy } = require("./shapers/interfaces");
-const _: typeof LodashUtils = Object.freeze({ omit, isObject, isPlainObject, hasIn, zipObject, pick, mapKeys, merge, flatMap });
+import { Validator, ReShaper, ShaperStrategy, Mapper } from "./shapers/index";
+import { ISettings, IStrategy } from "./shapers/interfaces";
 
-const strategy = new ShaperStrategy(_);
-strategy.setStrategy(new Validator(_));
-strategy.setStrategy(new ReShaper(_));
+const strategy: IStrategy = new ShaperStrategy();
+strategy.setStrategy(new Validator());
+strategy.setStrategy(new ReShaper());
+strategy.setStrategy(new Mapper());
 
-function permute(data: object | object[], settings: typeof ISettings) {
-  return strategy.operate(data, settings);
+async function Shape(data: object | object[], settings: ISettings) {
+  return await strategy.operate(data, settings);
 }
 
-module.exports = permute;
+module.exports = {
+  Shape,
+  Validator,
+  ReShaper,
+  Mapper
+};

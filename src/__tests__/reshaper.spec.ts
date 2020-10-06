@@ -3,8 +3,7 @@ import { LodashUtils } from "../shapers/interfaces";
 import { ReShaper } from "../shapers/reshaper";
 import { productApiResponse, productCollection } from "../mocks/product";
 import { Product } from "../mocks/entities";
-import { omit, isObject, isPlainObject, hasIn, zipObject, pick, mapKeys, merge, cloneDeep, flatMap } from "lodash";
-const _: LodashUtils = Object.freeze({ omit, isObject, isPlainObject, hasIn, zipObject, pick, mapKeys, merge, flatMap });
+import { cloneDeep } from "lodash";
 
 describe("ReShaper", () => {
   let reshaper;
@@ -13,7 +12,7 @@ describe("ReShaper", () => {
   let settings = Product;
 
   beforeEach(() => {
-    reshaper = new ReShaper(_);
+    reshaper = new ReShaper();
     collectionMock = cloneDeep(productCollection);
     productMock = cloneDeep(productApiResponse);
   });
@@ -108,9 +107,9 @@ describe("ReShaper", () => {
   });
 
   describe("operate", () => {
-    it("should return an object formatted to it's schema", () => {
+    it("should return an object formatted to it's schema", async () => {
       settings.current = "products";
-      const result = reshaper.operate(collectionMock, settings);
+      const result = await reshaper.operate(collectionMock, settings);
       expect(result.products[1]).toBeDefined();
       expect(result.variants['Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0VmFyaWFudC8zMjI3MTc1MTE1MTY5NQ==']).toBeDefined();
       expect(typeof result.products[1].variants[0] === "string").toBe(true);

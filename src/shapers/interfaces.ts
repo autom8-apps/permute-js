@@ -1,5 +1,5 @@
 export interface IObjectOperation {
-  operate: (object: object, settings ?: ISettings) => object|IModelDictionary
+  operate: (object: object, settings ?: ISettings) => Promise<object|IModelDictionary>
 }
 
 export type IOperation = (object: object, settings?: ISettings) => object | IModelDictionary;
@@ -19,7 +19,7 @@ export interface LodashUtils {
 export interface IStrategy {
   setStrategy: (strategy: IObjectOperation) => void
   getStrategy: (classKey: string) => IObjectOperation
-  operate: (object: object, settings?: ISettings) => object | IModelDictionary,
+  operate: (object: object, settings?: ISettings) => Promise<object | IModelDictionary>,
 }
 
 export interface Schema {
@@ -42,11 +42,11 @@ export interface LengthValidator extends Validator {
 }
 
 export interface IMapperSettings {
-  [key: string]: ISettingsMapper
+  [key: string]: IMapperEntitySettings
 }
 
-export interface ISettingsMapper {
-  [key: string]: string | ISettingsMapper
+export interface IMapperEntitySettings {
+  [key: string]: string | IMapperEntitySettings
 }
 
 export interface IObjectOperationDictionary {
@@ -56,7 +56,7 @@ export interface IObjectOperationDictionary {
 export interface ISettings {
   current ?: string
   schema: Schema
-  map?: ISettingsMapper
+  map?: IMapperSettings
   validate?: boolean
   uid?: string
   childrenUid?: string

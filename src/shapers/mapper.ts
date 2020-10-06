@@ -1,67 +1,81 @@
-/**
- * @todo create mapper shaper strategy that handle renaming of object propertyies for single object and collections
- */
-import { IObjectOperation, ISettings, LodashUtils, ISettingsMapper } from "./interfaces";
+import { IObjectOperation, ISettings, LodashUtils, IMapperEntitySettings } from "./interfaces";
+import { _ } from "./lodash-utils";
 
 export class Mapper implements IObjectOperation {
-  output: object | object[];
   private _:LodashUtils;
-  private settings: ISettings;
-  constructor(_: LodashUtils) {
+  settings: ISettings;
+  constructor() {
     this._ = _;
   }
 
-  mapCollection(entityMap: ISettingsMapper, collection: any) {
+  mapCollection(entityMap: IMapperEntitySettings, collection: any) {
     const mapProps = (item: object) => this.mapSingleEntity(entityMap, item);
     return collection.map(mapProps);
   }
 
-  mapKeys(entityMap: ISettingsMapper, entity: object) {
-    const formatted = {};
-    for (const key in entity) {
-      formatted[this.settings.map[key]] = entity[key];
+  mapKeys(entityMap: IMapperEntitySettings, entity: object) {
+    const entityKeys = Object.keys(entityMap);
+    const pickedProperties = this._.pick(entity, entityKeys);
+    const formatted = this._.omit(entity, entityKeys);
+
+    for (const key in pickedProperties) {
+      if (typeof entityMap[key] !== "object") {
+        formatted[entityMap[key].toString()] = pickedProperties[key];
+      }
     }
+
+    return formatted;
   }
 
-  mapSingleEntity(entityMap: ISettingsMapper, entity: object|object[]) {
-    return this.isCollection(entityMap, entity)
-      ? this.mapCollection(entityMap, entity)
-      : this.mapKeys(entityMap, entity);
+  mapSingleEntity(entityMap: IMapperEntitySettings, entity: object|object[]) {
+    if (this.isCollection(entityMap, entity)) {
+      return this.mapCollection(entityMap, entity)
+    }
+
+    return this.mapKeys(entityMap, entity);
   }
 
-  isMappable(data ?: object): boolean {
-    return this.settings
-      && this.settings.map !== undefined
-      && typeof this.settings.map === "object"
-      && data !== undefined;
+  isMappable(settings: ISettings, entity: object): boolean {
+    return typeof settings === "object"
+      && settings.map !== undefined
+      && typeof settings.map === "object"
+      && entity !== undefined;
   }
 
-  isCollection(entityMap: ISettingsMapper, data: object | object[]): boolean {
-    return Array.isArray(data) && typeof entityMap === "object";
+  isCollection(entityMap: IMapperEntitySettings, entity: object | object[]): boolean {
+    return Array.isArray(entity) && typeof entityMap === "object";
   }
 
-  mapProps(entityMap: ISettingsMapperComplex|ISettingsMapper, entity: object|object[]) {
-    return this.isCollection(entityMap, entity)
-      ? this.mapCollection(entityMap, entity)
-      : this.mapSingleEntity(entityMap, entity);
+  mapProps(entityMap: IMapperEntitySettings, entity: object | object[]) {
+    if (this.isCollection(entityMap, entity)) {
+      this.mapCollection(entityMap, entity)
+    }
+
+    return this.mapSingleEntity(entityMap, entity);
   }
 
-  format(data: object): object|object[] {
+  format(entity: object): object|object[] {
     const output = {};
+
     for (const key in this.settings.map) {
-      output[key] = this.mapProps(this.settings.map[key], data[key]);
+      output[key] = this.mapProps(this.settings.map[key], entity[key]);
     }
 
     return output;
   }
 
-  operate(data: object[], settings: ISettings): object|object[] {
+  async operate(entity: object[], settings: ISettings): Promise<object|object[]> {
     try {
-      this.settings = settings;
-      if (!this.isMappable()) throw new Error("Could not map properties to new object");
-      return this.format(data);
+      return new Promise(resolve => {
+        if (!this.isMappable(settings, entity)) {
+          throw new Error("Could not map properties to new object");
+        }
+
+        this.settings = settings;
+        resolve(this.format(entity));
+      });
     } catch (error) {
-      console.error("Object Mapper", error);
+      console.error("Object Mapper: ", error);
     }
   }
 }

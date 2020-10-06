@@ -1,5 +1,5 @@
 {
-  "name": "@autom8/permute",
+  "name": "permutejs",
   "version": "1.0.0",
   "description": "A simple frontend data manager for normalizing and validating data to help promote a more 'immutable' API for frontend applications that rely on mutuable data structures.",
   "main": "/dist/main.js",
