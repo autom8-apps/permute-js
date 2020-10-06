@@ -1,8 +1,8 @@
 export interface IObjectOperation {
-  operate: (object: object, settings ?: ISettings) => Object|IModelDictionary,
+  operate: (object: object, settings ?: ISettings) => object|IModelDictionary
 }
 
-export type IOperation = (object: object, settings?: ISettings) => Object | IModelDictionary;
+export type IOperation = (object: object, settings?: ISettings) => object | IModelDictionary;
 
 export interface LodashUtils {
   isPlainObject: Function
@@ -19,7 +19,7 @@ export interface LodashUtils {
 export interface IStrategy {
   setStrategy: (strategy: IObjectOperation) => void
   getStrategy: (classKey: string) => IObjectOperation
-  operate: (object: object, settings?: ISettings) => Object | IModelDictionary,
+  operate: (object: object, settings?: ISettings) => object | IModelDictionary,
 }
 
 export interface Schema {
@@ -41,13 +41,12 @@ export interface LengthValidator extends Validator {
   max: Number,
 }
 
-export interface ISettingsMapPoint {
-  from: string
-  to: string
+export interface IMapperSettings {
+  [key: string]: ISettingsMapper
 }
 
-export interface ISettingsMapPoints {
-  [key: string]: ISettingsMapPoint[]
+export interface ISettingsMapper {
+  [key: string]: string | ISettingsMapper
 }
 
 export interface IObjectOperationDictionary {
@@ -57,7 +56,7 @@ export interface IObjectOperationDictionary {
 export interface ISettings {
   current ?: string
   schema: Schema
-  map?: ISettingsMapPoints
+  map?: ISettingsMapper
   validate?: boolean
   uid?: string
   childrenUid?: string

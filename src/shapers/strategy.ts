@@ -24,7 +24,7 @@ export class ShaperStrategy extends SchemaManager implements IObjectOperation, I
     return this.strategies[classKey];
   }
 
-  validateAndShape(resource: object|object[], settings: ISettings) {
+  validateAndShape(resource: object|object[], settings: ISettings): object {
     let output = {};
     for (const key in settings.schema) {
       settings.current = key;
