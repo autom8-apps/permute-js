@@ -9,8 +9,7 @@ export class Mapper implements IObjectOperation {
   }
 
   mapCollection(entityMap: IMapperEntitySettings, collection: any) {
-    const mapProps = (item: object) => this.mapSingleEntity(entityMap, item);
-    return collection.map(mapProps);
+    return collection.map((item: object) => this.mapSingleEntity(entityMap, item));
   }
 
   mapKeys(entityMap: IMapperEntitySettings, entity: object) {
@@ -27,9 +26,17 @@ export class Mapper implements IObjectOperation {
     return formatted;
   }
 
-  mapSingleEntity(entityMap: IMapperEntitySettings, entity: object|object[]) {
+  singleNestedResource(entityMap: IMapperEntitySettings, entity: any) {
+    return typeof entity === "object" && typeof entityMap === "object";
+  }
+
+  mapSingleEntity(entityMap: IMapperEntitySettings, entity: any): object|object[] {
     if (this.isCollection(entityMap, entity)) {
       return this.mapCollection(entityMap, entity)
+    }
+
+    if (this.singleNestedResource(entityMap, entity)) {
+      return this.mapSingleEntity(entityMap, entity);
     }
 
     return this.mapKeys(entityMap, entity);
@@ -42,11 +49,17 @@ export class Mapper implements IObjectOperation {
       && entity !== undefined;
   }
 
-  isCollection(entityMap: IMapperEntitySettings, entity: object | object[]): boolean {
-    return Array.isArray(entity) && typeof entityMap === "object";
+  isNestedResource(entityMap: IMapperEntitySettings, entity: any): boolean {
+    return entity === "object" && typeof entityMap === "object";
   }
 
-  mapProps(entityMap: IMapperEntitySettings, entity: object | object[]) {
+  isCollection(entityMap: IMapperEntitySettings, entity: object | object[]): boolean {
+    return Array.isArray(entity)
+      && typeof entity[0] === "object"
+      && typeof entityMap === "object";
+  }
+
+  mapProps(entityMap: IMapperEntitySettings, entity: object | object[], key ?: string) {
     if (this.isCollection(entityMap, entity)) {
       this.mapCollection(entityMap, entity)
     }
@@ -58,7 +71,8 @@ export class Mapper implements IObjectOperation {
     const output = {};
 
     for (const key in this.settings.map) {
-      output[key] = this.mapProps(this.settings.map[key], entity[key]);
+      const propertyName = output[key]._name && output[key]._name || output[key];
+      output[propertyName] = this.mapProps(this.settings.map[key], entity[key], key);
     }
 
     return output;
