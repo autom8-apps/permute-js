@@ -46,6 +46,7 @@ export interface IMapperSettings {
 }
 
 export interface IMapperEntitySettings {
+  _name: string
   [key: string]: string | IMapperEntitySettings
 }
 

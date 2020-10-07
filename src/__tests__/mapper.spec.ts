@@ -1,3 +1,5 @@
+
+// @ts-nocheck
 import { Mapper } from "../shapers/mapper";
 import { productApiResponse } from "../mocks/product";
 
@@ -21,6 +23,16 @@ describe("Mapper", () => {
       }
     }
   };
+
+  const singleEntity = {
+    title: "name",
+    compareAtPrice: "price",
+    image: {
+      _name: "photo",
+      src: "url"
+          },
+    hasNextPage: "next"
+  }
 
   const mapper = new Mapper();
   mapper.settings = settings;
@@ -63,6 +75,14 @@ describe("Mapper", () => {
     expect(formatted[0].available).toBeDefined();
     expect(formatted[0].price).toBeDefined();
     expect(formatted[0].next).toBeDefined();
+  });
+
+  describe("Mapper.mapKeys", () => {
+    const formatted = mapper.mapKeys(singleEntity, productApiResponse.variants[0]);
+    expect(formatted.name).toBeDefined();
+    expect(formatted.available).toBeDefined();
+    expect(formatted.price).toBeDefined();
+    expect(formatted.photo).toBeDefined();
   });
 })
 
