@@ -1,4 +1,4 @@
-import { IObjectOperation, ISettings, LodashUtils, IMapperEntitySettings } from "./interfaces";
+import { IObjectOperation, ISettings, LodashUtils, IMapperEntitySettings, IMapperSettings } from "./interfaces";
 import { _ } from "./lodash-utils";
 
 export class Mapper implements IObjectOperation {
@@ -9,33 +9,7 @@ export class Mapper implements IObjectOperation {
   }
 
   mapCollection(entityMap: IMapperEntitySettings, collection: any) {
-    return collection.map((item: object) => this.mapSingleEntity(entityMap, item));
-  }
-
-  mapKeys(entityMap: IMapperEntitySettings, entity: object) {
-    const entityKeys = Object.keys(entityMap);
-    const pickedProperties = this._.pick(entity, entityKeys);
-    const formatted = this._.omit(entity, entityKeys);
-
-    for (const key in pickedProperties) {
-      if (this.isEntity(this.settings.map[key], entity[key])) {
-        formatted[this.getPropertyName(key)] = this.mapSingleEntity(entityMap, entity);
-      }
-
-      if (typeof entityMap[key] !== "object") {
-        formatted[entityMap[key].toString()] = pickedProperties[key];
-      }
-    }
-
-    return formatted;
-  }
-
-  mapSingleEntity(entityMap: IMapperEntitySettings, entity: any): object|object[] {
-    if (this.isCollection(entityMap, entity)) {
-      return this.mapCollection(entityMap, entity)
-    }
-
-    return this.mapKeys(entityMap, entity);
+    return collection.map((item: object) => this.map(entityMap, item));
   }
 
   isMappable(settings: ISettings, entity: object): boolean {
@@ -51,16 +25,28 @@ export class Mapper implements IObjectOperation {
       && typeof entityMap === "object";
   }
 
-  isEntity(entityMap: IMapperEntitySettings, entity: object | object[]) {
+  isEntity(entityMap: IMapperEntitySettings | string, entity: object | object[]) {
     return typeof entityMap === "object" && typeof entity === "object";
   }
 
-  mapProps(entityMap: IMapperEntitySettings, entity: object | object[]) {
-    if (this.isCollection(entityMap, entity)) {
-      this.mapCollection(entityMap, entity)
+  map(entityMap: IMapperEntitySettings | IMapperSettings | string, entity: object) {
+    const entityKeys = Object.keys(entityMap);
+    const pickedProperties = this._.pick(entity, entityKeys);
+    const formatted = {};
+
+    for (const key in pickedProperties) {
+      if (this.isCollection(entityMap[key], entity[key])) {
+        formatted[this.getPropertyName(key)] = this.mapCollection(entityMap[key], entity[key]);
+      }
+
+      if (this.isEntity(entityMap[key], entity[key])) {
+        formatted[this.getPropertyName(key)] = this.map(entityMap[key], entity[key]);
+      }
+
+      formatted[entityMap[key].toString()] = pickedProperties[key];
     }
 
-    return this.mapSingleEntity(entityMap, entity);
+    return formatted;
   }
 
   getPropertyName(key: string): string {
@@ -71,7 +57,7 @@ export class Mapper implements IObjectOperation {
     const output = {};
 
     for (const key in entity) {
-      output[this.getPropertyName(key)] = this.mapProps(this.settings.map[key], entity[key]);
+      output[this.getPropertyName(key)] = this.map(this.settings.map[key], entity[key]);
     }
 
     return output;

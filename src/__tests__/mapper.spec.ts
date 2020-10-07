@@ -24,13 +24,19 @@ describe("Mapper", () => {
     }
   };
 
+  const settingsSingleEntity = {
+    availableForSale: "available",
+    productType: "type",
+    title: "name",
+  };
+
   const singleEntity = {
     title: "name",
     compareAtPrice: "price",
     image: {
       _name: "photo",
       src: "url"
-          },
+    },
     hasNextPage: "next"
   }
 
@@ -53,17 +59,30 @@ describe("Mapper", () => {
     });
   });
 
+  describe('Mapper.isEntity', () => {
+    it('should return false if settings isnt set', () => {
+      expect(mapper.isEntity(undefined, singleEntity)).toBe(false);
+    });
+
+    it('should return true if settings and entity are set and settings has the map property', () => {
+      expect(mapper.isEntity(settings, singleEntity)).toBe(true);
+    });
+
+    it('should return false if settings is set but entity is not an object', () => {
+      expect(mapper.isEntity(settings, "string")).toBe(false);
+    });
+  });
+
   describe('Mapper.isCollection', () => {
     it('should return true if entity map is an object and entity is an array of objects', () => {
-      expect(mapper.isCollection({}, [{}])).toBe(true);
+      expect(mapper.isCollection(settings, [singleEntity])).toBe(true);
     });
 
     it('should return false if entity map is an object and entity is an array of non-objects', () => {
-      expect(mapper.isCollection({}, [])).toBe(false);
+      expect(mapper.isCollection(settings, [])).toBe(false);
     });
 
     it('should return false if entity map is not an object', () => {
-      // @ts-ignore
       expect(mapper.isCollection("string", [])).toBe(false);
     });
   });
@@ -78,11 +97,34 @@ describe("Mapper", () => {
   });
 
   describe("Mapper.mapKeys", () => {
+    mapper.settings = {
+      map: singleEntity
+    };
+
     const formatted = mapper.mapKeys(singleEntity, productApiResponse.variants[0]);
     expect(formatted.name).toBeDefined();
     expect(formatted.available).toBeDefined();
     expect(formatted.price).toBeDefined();
     expect(formatted.photo).toBeDefined();
   });
+
+  describe('mapSingleEntity', () => {
+    const spyIsCollection = jest.spyOn(mapper, "isCollection");
+    const mapCollectionSpy = jest.spyOn(mapper, "mapCollection");
+    const spyMapSingleEntity = jest.spyOn(mapper, "mapSingleEntity");
+    const result = mapper.mapSingleEntity(settingsSingleEntity, productApiResponse);
+    expect(spyIsCollection).toBeCalledTimes(1);
+    expect(mapCollectionSpy).not.toBeCalled();
+    expect(spyMapSingleEntity).toBeCalledTimes(1);
+    expect(spyMapSingleEntity).toBeCalledWith(settingsSingleEntity, productApiResponse);
+    expect(result.available).toBeDefined();
+    expect(result.type).toBeDefined();
+    expect(result.name).toBeDefined();
+  });
+
+  afterEach(() => {
+    mapper.settings = settings;
+    jest.restoreAllMocks();
+  })
 })
 
