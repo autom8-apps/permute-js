@@ -9,7 +9,36 @@ export class Mapper implements IObjectOperation {
   }
 
   mapCollection(entityMap: IMapperEntitySettings, collection: any) {
-    return collection.map((item: object) => this.map(entityMap, item));
+    return collection.map((item: object) => this.mapEntity(entityMap, item));
+  }
+
+  mapKeys(entityMap: IMapperEntitySettings | IMapperSettings | string, entity: object) {
+    const entityKeys = Object.keys(entityMap);
+    const pickedProperties = this._.pick(entity, entityKeys);
+    const formatted = {};
+
+    for (const key in pickedProperties) {
+      switch (true) {
+        case this.isCollection(entityMap[key], entity[key]):
+          formatted[this.getPropertyName(entityMap, key)] = this.mapCollection(entityMap[key], entity[key])
+          break;
+        case this.isEntity(entityMap[key], entity[key]):
+          formatted[this.getPropertyName(entityMap, key)] = this.mapEntity(entityMap[key], entity[key]);
+          break;
+        default:
+          formatted[entityMap[key]] = pickedProperties[key];
+      }
+    }
+
+    return formatted;
+  }
+
+  mapEntity(entityMap: IMapperEntitySettings, entity: any): object|object[] {
+    if (this.isCollection(entityMap, entity)) {
+      return this.mapCollection(entityMap, entity)
+    }
+
+    return this.mapKeys(entityMap, entity);
   }
 
   isMappable(settings: ISettings, entity: object): boolean {
@@ -25,39 +54,19 @@ export class Mapper implements IObjectOperation {
       && typeof entityMap === "object";
   }
 
-  isEntity(entityMap: IMapperEntitySettings | string, entity: object | object[]) {
+  isEntity(entityMap: IMapperEntitySettings|string, entity: object | object[]) {
     return typeof entityMap === "object" && typeof entity === "object";
   }
 
-  map(entityMap: IMapperEntitySettings | IMapperSettings | string, entity: object) {
-    const entityKeys = Object.keys(entityMap);
-    const pickedProperties = this._.pick(entity, entityKeys);
-    const formatted = {};
-
-    for (const key in pickedProperties) {
-      if (this.isCollection(entityMap[key], entity[key])) {
-        formatted[this.getPropertyName(key)] = this.mapCollection(entityMap[key], entity[key]);
-      }
-
-      if (this.isEntity(entityMap[key], entity[key])) {
-        formatted[this.getPropertyName(key)] = this.map(entityMap[key], entity[key]);
-      }
-
-      formatted[entityMap[key].toString()] = pickedProperties[key];
-    }
-
-    return formatted;
-  }
-
-  getPropertyName(key: string): string {
-    return this.settings.map[key] && this.settings.map[key]._name || key;
+  getPropertyName(entityMap: IMapperEntitySettings | IMapperSettings | string, key: string): string {
+    return entityMap[key] && entityMap[key]._name || key;
   }
 
   format(entity: object): object|object[] {
     const output = {};
 
     for (const key in entity) {
-      output[this.getPropertyName(key)] = this.map(this.settings.map[key], entity[key]);
+      output[this.getPropertyName(this.settings.map, key)] = this.mapEntity(this.settings.map[key], entity[key]);
     }
 
     return output;
