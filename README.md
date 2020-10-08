@@ -2,11 +2,11 @@
 
 A small low dependency library for normalizing and validating data. This primary goal of this library was to improve data interaction of the frontend and provide a solution for developers, who may not have the ability to work with the API team to get the ideal shape of data, can now quickly normalize that data into formats that best suite their needs rather than shaping their application around less than ideal data structures. This idea was inspired by the Redux community in the following article https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape.
 
-Immutable data structures have been found to lower bug density considerably. However, for most modern frontend developers using reactive frameworks like Vue or React, we are unable to implement immutable data structures in our state management systems because the rendering systems of these frameworks are depdenent upon mutable data structures. This library aims to provide an alternative solution to immutablility by providing normalization and validation middleware to ensure your data is in the shape you need and always has the values you need (lowered value mutability errors). 
+Immutable data structures have been found to lower bug density considerably. However, for most modern frontend developers using reactive frameworks like Vue or React, we are unable to implement immutable data structures in our state management systems because the rendering systems of these frameworks are depdenent upon mutable data structures. This library aims to provide an alternative solution to immutablility by providing normalization and validation middleware to ensure your data is in the shape you need and always has the values you need (lowered value mutability errors).
 
 ## Usage
 
-The entry point to the formatter is through the **permute()** facade which takes two arguments, the data you want to format, and the schema to which the data should be formatted to.
+The entry point to the formatter is through the **Permute.Shape()** facade which takes two arguments, the data you want to format, and the schema to which the data should be formatted to.
 
 Since I am primarily a Vue.js developer I will be providing example use cases of how I use this library in our applications here at the taproom but the patterns can be utilized in any state management system I'd imagine, the framework is agnostic so you could even use it across the whole stack if you'd like!
 
@@ -55,7 +55,7 @@ export const PRODUCTS_MODULE = {
     async GET_PRODUCTS({ commit }) {
       const res = await fetch("https://api.com/products");
       const { products } = await res.json();
-      const formatted = await smelt(products, schema);
+      const formatted = await Permute.Shape(products, schema);
       commit("SET_PRODUCTS", formatted);
     }
   },
@@ -223,6 +223,5 @@ Like variants in the example below, if you provide a nested schema, Permute will
 
 ```
 npm run test
-npm run yarn
 ```
 
