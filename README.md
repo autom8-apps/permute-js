@@ -42,7 +42,7 @@ async GET_PRODUCTS({ commit }) {
 
   const res = await fetch("https://api.com/products");
   const { products } = await res.json();
-  const formatted = permute(products, schema); // async coming soon!
+  const formatted = await Permute.Shape(products, schema); // async coming soon!
   commit("SET_PRODUCTS", formatted);
 }
 ```
