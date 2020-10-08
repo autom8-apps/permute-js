@@ -1,13 +1,13 @@
-import { Validator, ReShaper, ShaperStrategy, Mapper } from "./shapers/index";
-import { ISettings, IStrategy } from "./shapers/interfaces";
+const { Validator, ReShaper, ShaperStrategy, Mapper } = require("./shapers/index");
+const { ISettings, IStrategy } = require("./shapers/interfaces");
 
-const strategy: IStrategy = new ShaperStrategy();
+const strategy = new ShaperStrategy();
 strategy.setStrategy(new Validator());
 strategy.setStrategy(new ReShaper());
 strategy.setStrategy(new Mapper());
 
-async function Shape(data: object | object[], settings: ISettings) {
-  return await strategy.operate(data, settings);
+function Shape(data: object | object[], settings: typeof ISettings) {
+  return strategy.operate(data, settings);
 }
 
 module.exports = {
