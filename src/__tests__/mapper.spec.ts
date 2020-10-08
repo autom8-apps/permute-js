@@ -7,47 +7,24 @@ describe("Mapper", () => {
   const settingsMock = {
     schema: {},
     map: {
-      products: {
-        availableForSale: "available",
-        productType: "type",
+      availableForSale: "available",
+      productType: "type",
+      title: "name",
+      variants: {
         title: "name",
-        variants: {
-          title: "name",
-          available: "inStock",
-          compareAtPrice: "price",
-          image: {
-            _name: "photo",
-            src: "url"
-          },
-          hasNextPage: "next"
-        }
+        available: "inStock",
+        compareAtPrice: "price",
+        image: {
+          _name: "photo",
+          src: "url"
+        },
+        hasNextPage: "next"
       }
     }
   };
 
-  const settingsSingleEntityMockComplex = {
-    schema: {},
-    map: {
-      product: {
-        availableForSale: "available",
-        productType: "type",
-        title: "name",
-        variants: {
-          title: "name",
-          available: "inStock",
-          compareAtPrice: "price",
-          image: {
-            _name: "photo",
-            src: "url"
-          },
-          hasNextPage: "next"
-        }
-      }
-    }
-  };
-
-  const collectionMock = { products: [productApiResponse] }
-  const singleEntityMock = { product: productApiResponse }
+  const collectionMock = [productApiResponse]
+  const singleEntityMock = productApiResponse
 
   const settingsSingleEntityMock = {
     availableForSale: "available",
@@ -113,7 +90,7 @@ describe("Mapper", () => {
 
   describe('Mapper.mapCollection', () => {
     it("should iterate through a collection mapping each entity to it's corresponding entity map", () => {
-      const formatted = mapper.mapCollection(settingsMock.map.products.variants, productApiResponse.variants);
+      const formatted = mapper.mapCollection(settingsMock.map.variants, productApiResponse.variants);
       expect(Array.isArray(formatted)).toBe(true);
       expect(formatted[0].name).toBeDefined();
       expect(formatted[0].inStock).toBeDefined();
@@ -178,29 +155,28 @@ describe("Mapper", () => {
       const mappedResult = mapper.format(collectionMock);
       expect(mappedResult).toBeDefined();
       expect(typeof mappedResult === "object").toBe(true);
-      expect(mappedResult.products).toBeDefined();
-      expect(typeof mappedResult.products[0] === "object").toBe(true);
-      expect(mappedResult.products[0].available).toBe(true);
-      expect(mappedResult.products[0].variants).toBeDefined();
-      expect(Array.isArray(mappedResult.products[0].variants)).toBe(true);
-      expect(typeof mappedResult.products[0].variants[0] === "object").toBe(true);
+      expect(mappedResult).toBeDefined();
+      expect(typeof mappedResult[0] === "object").toBe(true);
+      expect(mappedResult[0].available).toBe(true);
+      expect(mappedResult[0].variants).toBeDefined();
+      expect(Array.isArray(mappedResult[0].variants)).toBe(true);
+      expect(typeof mappedResult[0].variants[0] === "object").toBe(true);
     });
     it("should map single data entity based on settings and data provided", () => {
-      mapper.settings = settingsSingleEntityMockComplex;
       const mappedResult = mapper.format(singleEntityMock);
       expect(mappedResult).toBeDefined();
       expect(typeof mappedResult === "object").toBe(true);
-      expect(mappedResult.product.variants).toBeDefined();
-      expect(mappedResult.product.available).toBeDefined();
-      expect(Array.isArray(mappedResult.product.variants)).toBe(true);
-      expect(typeof mappedResult.product.variants[0] === "object").toBe(true);
+      expect(mappedResult.variants).toBeDefined();
+      expect(mappedResult.available).toBeDefined();
+      expect(Array.isArray(mappedResult.variants)).toBe(true);
+      expect(typeof mappedResult.variants[0] === "object").toBe(true);
     });
   });
 
   describe('Mapper.operate', () => {
     it("should asynchronously map based on settings and data provided", async () => {
       const mappedResult = await mapper.operate(collectionMock, settingsMock);
-      expect(mappedResult.products).toBeDefined();
+      expect(mappedResult).toBeDefined();
     });
   });
 

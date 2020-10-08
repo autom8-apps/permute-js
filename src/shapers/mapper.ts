@@ -63,13 +63,7 @@ export class Mapper implements IObjectOperation {
   }
 
   format(entity: object): object|object[] {
-    const output = {};
-
-    for (const key in entity) {
-      output[this.getPropertyName(this.settings.map, key)] = this.mapEntity(this.settings.map[key], entity[key]);
-    }
-
-    return output;
+    return this.mapEntity(this.settings.map, entity);
   }
 
   async operate(entity: object[], settings: ISettings): Promise<object|object[]> {

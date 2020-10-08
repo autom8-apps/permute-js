@@ -40,3 +40,36 @@ export const Product: ISettings = {
   },
 };
 
+export const ProductWithMapper: ISettings = {
+  map: {
+    products: {
+      id: "id",
+      title: "title",
+      handle: "handle",
+      availableForSale: "availableForSale",
+      productType: "productType",
+      onlineStoreUrl: "onlineStoreUrl",
+      images: {
+        _name: "images",
+        id: "id",
+        src: "src",
+        altText: "altText",
+      },
+      vendor: "images",
+      variants: {
+        id: "id",
+        price: "price",
+        title: "title",
+        compareAtPrice: "compareAtPrice",
+        available: "available",
+        selectedOptions: "selectedOptions",
+      },
+    }
+  },
+  schema: {
+    products: ProductSchema,
+    variants: VariantSchema,
+    images: ProductImageSchema
+  },
+};
+
