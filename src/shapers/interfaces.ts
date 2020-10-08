@@ -57,7 +57,7 @@ export interface IObjectOperationDictionary {
 export interface ISettings {
   current ?: string
   schema: Schema
-  map?: IMapperSettings
+  map?: IMapperEntitySettings
   validate?: boolean
   uid?: string
   childrenUid?: string
