@@ -1,25 +1,28 @@
 import { IObjectOperation, ISettings, Schema, LodashUtils, SchemaType } from "./interfaces";
 import { SchemaManager } from "./schema-manager";
+import { _ } from "./lodash-utils";
 
 export class Validator extends SchemaManager implements IObjectOperation {
-  constructor(_: LodashUtils) {
+  constructor() {
     super(_);
   }
 
-  operate(data: any, settings: ISettings): object {
+  async operate(data: any, settings: ISettings): Promise<object> {
     try {
-      let errors: string[] = [];
+      return new Promise(resolve => {
+        let errors: string[] = [];
 
-      if (!this.isShapable(settings, data)) return data;
+        if (!this.isShapable(settings, data)) return data;
 
-      const first = Object.keys(settings.schema)[0];
-      this.validate(data, settings.schema[first], settings, errors);
+        const first = Object.keys(settings.schema)[0];
+        this.validate(data, settings.schema[first], settings, errors);
 
-      if (errors && Object.keys(errors).length > 0) {
-        throw new Error(errors.join(","));
-      }
+        if (errors && Object.keys(errors).length > 0) {
+          throw new Error(errors.join(","));
+        }
 
-      return data;
+        resolve(data);
+      })
     } catch (errors) {
       console.error("Permute.js - VALIDATION ERROR OCCURED: ");
       console.table(

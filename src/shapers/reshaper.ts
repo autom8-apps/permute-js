@@ -1,8 +1,9 @@
-import { IObjectOperation, ISettings, LodashUtils, SchemaType, IModelDictionary } from "./interfaces";
+import { IObjectOperation, ISettings, IModelDictionary } from "./interfaces";
 import { SchemaManager } from "./schema-manager";
+import { _ } from "./lodash-utils";
 
 export class ReShaper extends SchemaManager implements IObjectOperation {
-  constructor(_: LodashUtils) {
+  constructor() {
     super(_);
   }
 
@@ -124,10 +125,12 @@ export class ReShaper extends SchemaManager implements IObjectOperation {
     return dictionary;
   }
 
-  operate(data: object[], settings: ISettings): object | IModelDictionary {
+  async operate(data: object[], settings: ISettings): Promise<object | IModelDictionary> {
     try {
-      if (!this.isShapable(settings, data)) return data;
-      return this.format(data, settings);
+      return new Promise(resolve => {
+        if (!this.isShapable(settings, data)) return data;
+        resolve(this.format(data, settings));
+      })
     } catch (error) {
       console.error("Object Shaper", error);
     }
