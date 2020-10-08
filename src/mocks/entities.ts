@@ -54,7 +54,7 @@ export const ProductWithMapper: ISettings = {
       src: "src",
       altText: "altText",
     },
-    vendor: "images",
+    vendor: "vendor",
     variants: {
       id: "id",
       price: "price",
