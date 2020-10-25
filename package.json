@@ -1,6 +1,6 @@
 {
   "name": "permutejs",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A simple frontend data manager for normalizing and validating data to help promote a more 'immutable' API for frontend applications that rely on mutuable data structures.",
   "main": "/dist/main.js",
   "typings": "index.d.ts",
