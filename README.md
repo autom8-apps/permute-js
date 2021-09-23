@@ -47,52 +47,6 @@ async GET_PRODUCTS({ commit }) {
 }
 ```
 
-### And in the near future, I'll be releasing a vuex plugin so you can add schema to your vuex modules as if they were natively part of the library!
-
-```js
-export const PRODUCTS_MODULE = {
-  actions: {
-    async GET_PRODUCTS({ commit }) {
-      const res = await fetch("https://api.com/products");
-      const { products } = await res.json();
-      const formatted = await Permute.Shape(products, schema);
-      commit("SET_PRODUCTS", formatted);
-    }
-  },
-  schema: {
-    products: {
-      _uid: "id",
-      id: String,
-      title: String,
-      handle: String,
-      availableForSale: Boolean,
-      productType: String,
-      onlineStoreUrl: String,
-      images: [String],
-      vendor: String,
-      variants: [String],
-    },
-    variants: {
-      _uid: "id",
-      id: String,
-      price: String,
-      title: String,
-      compareAtPrice: [String, null],
-      available: Boolean,
-      selectedOptions: [Object],
-      products: String,
-    },
-    images: {
-      _uid: "id",
-      id: String,
-      src: String,
-      altText: String,
-      products: String,
-    }
-  },
-}
-```
-
 It's important to note that the above data structure represents what the output will look like not what it currently is before normalization.
 
 Collections of parent object (in this example products) can be single object and validation and format will still take place while also formatting and validating nested collections of child objects.
